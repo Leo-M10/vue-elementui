@@ -7,13 +7,15 @@
 <script>
 
 
-import Login from "@/components/login/Login.vue";
+import elementUiConfig from "@/config/element-ui.config";
 
 export default {
   name: 'App',
+  created() {
+    new elementUiConfig()
+    // new DevicePixelRatio().init()
+  },
   components: {
-    Login
-
   }
 }
 </script>

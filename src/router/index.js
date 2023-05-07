@@ -5,6 +5,7 @@ import Layout from "@/components/layout/Layout.vue";
 import Register from "@/components/login/Register.vue";
 import Content from "@/components/layout/content/Content.vue";
 import SysUser from "@/components/layout/content/system/SysUser.vue";
+import SysMenu from "@/components/layout/content/system/SysMenu.vue";
 
 Vue.use(VueRouter)
 const router = new VueRouter({
@@ -12,9 +13,10 @@ const router = new VueRouter({
         {path: '/', redirect: '/login'},
         {path: '/login', component: Login},
         {
-            path: '/layout', component: Layout, redirect: '/home', children: [
+            path: '/home', component: Layout, redirect: '/home', children: [
                 {path: '/home', component: Content},
-                {path: '/sysUser', component: SysUser}
+                {path: '/sysUser', component: SysUser},
+                {path: '/sysMenu', component: SysMenu}
             ]
         },
         {path: '/register', component: Register},

@@ -1,6 +1,6 @@
 <template>
   <div class="aside">
-    <el-menu :default-active="$router.currentRoute.path" class="el-menu-vertical-demo" :collapse="isCollapse" :collapse-transition="false"
+    <el-menu :default-active="$route.path" class="el-menu-vertical-demo" :collapse="isCollapse" :collapse-transition="false"
              v-bind:unique-opened="isUniqueOpened" router
              @open="handleOpen" @close="handleClose" background-color="#3d4b61" text-color="#fff"
              active-text-color="#409EFF">
@@ -22,9 +22,9 @@
           <span>{{ item.menuName }}</span>
         </template>
         <!--        二级菜单-->
-        <el-menu-item :index="`${child.id}`" v-for="child in item.child" :key="child.id">
+        <el-menu-item :index="`${child.path}`" v-for="child in item.child" :key="child.id">
           <template>
-            <i class="el-icon-menu"></i>
+            <i :class="`${child.icon}`"></i>
             <span>
           {{ child.menuName }}
             </span>
@@ -43,14 +43,14 @@ export default {
       isCollapse: false,
       isUniqueOpened: true,
       menuList: [
-        {menuName: '系统管理', id: 1, icon: 'el-icon-s-tools', child: [{menuName: '用户管理', id: '/sysUser'}]},
-        {menuName: '项目管理', id: 2, icon: 'el-icon-s-cooperation', child: [{menuName: '项目立项', id: 112}]},
+        // {menuName: '系统管理', id: 1, icon: 'el-icon-s-tools', child: [{menuName: '用户管理', id: '/sysUser'}]},
+        // {menuName: '项目管理', id: 2, icon: 'el-icon-s-cooperation', child: [{menuName: '项目立项', id: 112}]},
       ]
     }
   },
   emits: ['collapse'],
   created() {
-    // this.getMenuList()
+    this.getMenuList()
   },
   methods: {
     handleOpen(key, keyPath) {

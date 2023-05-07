@@ -1,11 +1,12 @@
 <template>
   <div class="sysUser">
     <!--    面包屑导航区域-->
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>系统管理</el-breadcrumb-item>
-      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-    </el-breadcrumb>
+    <Bread :bread-list="breadList"></Bread>
+<!--    <el-breadcrumb separator-class="el-icon-arrow-right">-->
+<!--      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>-->
+<!--      <el-breadcrumb-item>系统管理</el-breadcrumb-item>-->
+<!--      <el-breadcrumb-item>用户管理</el-breadcrumb-item>-->
+<!--    </el-breadcrumb>-->
     <!--    卡片区域-->
     <el-card>
       <!--用户功能操作区域-->
@@ -13,6 +14,7 @@
         <el-col :offset="0" :span="12">
           <el-button type="primary" @click="addUserDialog=true">添加用户</el-button>
           <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="deleteBaths">删除</el-button>
         </el-col>
       </el-row>
       <!--搜索区域-->
@@ -29,7 +31,8 @@
         </el-col>
       </el-row>
       <!--列表显示区域-->
-      <el-table :data="userList" border height="468" stripe>
+      <el-table :data="userList" border  stripe @selection-change="changeIndex">
+        <el-table-column type="selection" width="40"></el-table-column>
         <el-table-column label="序号" type="index"></el-table-column>
         <el-table-column label="用户名" prop="username"></el-table-column>
         <el-table-column label="昵称" prop="nickName"></el-table-column>
@@ -54,7 +57,7 @@
         </el-table-column>
       </el-table>
       <!--分页区域-->
-      <el-pagination :page-size="queryInfo.pageSize" :page-sizes="[8]" :total="queryInfo.total"
+      <el-pagination :page-size="queryInfo.pageSize" :page-sizes="[8,13]" :total="queryInfo.total"
                      layout="total, sizes, prev, pager, next, jumper"
                      @size-change="handleSizeChange" @current-change="handleCurrentChange">
       </el-pagination>
@@ -137,8 +140,11 @@
 
 <script>
 
+import Bread from "@/common/Bread.vue";
+
 export default {
   name: "SysUser",
+  components: {Bread},
   data() {
     let checkSalt = (rule, value, callback) => {
       let reg = /^[A-Za-z0-9]+$/
@@ -159,6 +165,8 @@ export default {
         pageSize: 8,
         total: 0
       },
+      //多选框选中的数据
+      selectUserIds: [],
       addUserDialog: false,
       editUserDialog: false,
       //校验规则
@@ -194,11 +202,17 @@ export default {
         status: '',
         createTime: '',
         updateTime: ''
-      }
+      },
+      //面包屑数据
+      breadList: [
+       //    {menuName: '系统管理', id: 1, icon: 'el-icon-s-tools', child: [{menuName: '用户管理', id: '/sysUser'}]},
+       // {menuName: '项目管理', id: 2, icon: 'el-icon-s-cooperation', child: [{menuName: '项目立项', id: 112}]},
+      ]
     }
   },
   created() {
     this.getUserList()
+    this.getBreadList(this.$route.path).then(result => this.breadList = result)
   },
   methods: {
     // 更改页容量
@@ -225,6 +239,12 @@ export default {
       this.userList = result.data.list
       this.queryInfo.total = Number(result.data.total)
     },
+    //通过多选框选择用户
+    changeIndex(value) {
+      this.selectUserIds = value.map((item,index) => {
+        return item.id
+      })
+    },
     //switch开关change事件改变用户状态
     async userStatusChange(userInfo) {
       const {data} = await this.$http.put(`/sysUser/updateStatus/${userInfo.id}/${userInfo.status}`)
@@ -244,10 +264,11 @@ export default {
     addUser(formName) {
       this.$refs[formName].validate(async (valid) => {
             if (!valid) return
-            this.addUserDialog = false
+
             const {data} = await this.$http.post('/sysUser/add', this.rulesForm)
             this.resetForm(formName)
             if (data.code !== 200) return this.$message.error(data.message)
+            this.addUserDialog = false
             this.$message.success('添加成功!')
             await this.getUserList()
           }
@@ -266,7 +287,7 @@ export default {
       this.editUserDialog = false
     },
     //提交编辑信息
-    async submitEditForm(formName, id) {
+    submitEditForm(formName, id) {
       this.$refs[formName].validate(async valid => {
         if (!valid) return
         const {data} = await this.$http.put(`/sysUser/${id}`, {
@@ -276,11 +297,11 @@ export default {
         })
         if (data.code !== 200) return this.$message.error(data.message === 'success' ? null : data.message)
         this.editUserDialog = false
-      }).then(async () => {
         this.$message.success('编辑成功!')
         await this.getUserList()
       })
     },
+    //操作栏删除
     deleteUser(id) {
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -294,6 +315,11 @@ export default {
       }).catch(() => {
         this.$message.info('已取消删除!')
       });
+    },
+    //功能栏删除
+    deleteBaths() {
+      if (this.selectUserIds.length ===0) return this.$message.error('请选择要删除的用户!')
+
     }
   }
 }
@@ -304,10 +330,6 @@ export default {
   margin: 20px;
   //padding-bottom: 50px;
   padding: 0;
-
-  .el-pagination {
-
-  }
 
   //.el-form {
   //  display: flex;

@@ -9,6 +9,8 @@ html,body,#app {
     height: 100%;
     margin: 0;
     padding: 0;
+    min-width: 1400px;
+    min-height: 1000px;
 }
 
 /*面包屑组件*/
@@ -26,4 +28,8 @@ html,body,#app {
 }
 .el-pagination {
     margin-top: 10px;
+}
+
+.el-dialog {
+    border-radius: 10px;
 }
