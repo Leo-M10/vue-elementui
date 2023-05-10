@@ -28,7 +28,7 @@ axios.interceptors.response.use(
         return response
     }
 )
-
+//根据路由路径获取面包屑数据
 async function getBreadList(route) {
     const {data} = await this.$http.get(`/sysMenu/getBreadList/${route}`)
     if (data.code !== 200) return this.$message.error('获取菜单列表失败!')
