@@ -2,11 +2,6 @@
   <div class="sysUser">
     <!--    面包屑导航区域-->
     <Bread :bread-list="breadList"></Bread>
-<!--    <el-breadcrumb separator-class="el-icon-arrow-right">-->
-<!--      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>-->
-<!--      <el-breadcrumb-item>系统管理</el-breadcrumb-item>-->
-<!--      <el-breadcrumb-item>用户管理</el-breadcrumb-item>-->
-<!--    </el-breadcrumb>-->
     <!--    卡片区域-->
     <el-card>
       <!--用户功能操作区域-->
@@ -18,20 +13,32 @@
         </el-col>
       </el-row>
       <!--搜索区域-->
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <div style="margin-top: 15px;">
-            <el-input v-model="queryInfo.query" class="input-with-select" clearable placeholder="请输入用户账号"
-                      @clear="this.getUserList">
-              <template v-slot:append>
-                <el-button icon="el-icon-search" @click="searchUser"></el-button>
-              </template>
-            </el-input>
+      <el-form >
+        <el-row :gutter="20">
+          <div class="el-row_div">
+            <el-col :offset="0" :span="5.5">
+              <el-date-picker v-model="fullTime" type="datetimerange" @change="changeFullTime" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd HH:mm:ss">
+              </el-date-picker>
+            </el-col>
+            <el-col :offset="0" :span="3">
+              <el-select v-model="queryInfo.status" placeholder="请选择状态" clearable>
+                <el-option label="启用" :value="0"></el-option>
+                <el-option label="停用" :value="1"></el-option>
+              </el-select>
+            </el-col>
+            <el-col :offset="0" :span="5">
+              <el-input v-model="queryInfo.query" class="input-with-select" clearable placeholder="请输入检索的用户账号"
+                        @clear="this.getUserList">
+                <template v-slot:append>
+                  <el-button icon="el-icon-search" @click="searchUser"></el-button>
+                </template>
+              </el-input>
+            </el-col>
           </div>
-        </el-col>
-      </el-row>
+        </el-row>
+      </el-form>
       <!--列表显示区域-->
-      <el-table :data="userList" border  stripe @selection-change="changeIndex">
+      <el-table :data="userList" border stripe @selection-change="changeIndex">
         <el-table-column type="selection" width="40"></el-table-column>
         <el-table-column label="序号" type="index"></el-table-column>
         <el-table-column label="用户名" prop="username"></el-table-column>
@@ -159,13 +166,18 @@ export default {
       //查询数据
       queryInfo: {
         username: '',
+        status: null,
+        beginTime: '',
+        endTime: '',
         //当前页数
         pageNum: 1,
         //每页条数
         pageSize: 8,
         total: 0
       },
-      //多选框选中的数据
+      //时间选择器的时间
+      fullTime: [],
+      //多选框选中的数据id
       selectUserIds: [],
       addUserDialog: false,
       editUserDialog: false,
@@ -205,8 +217,8 @@ export default {
       },
       //面包屑数据
       breadList: [
-       //    {menuName: '系统管理', id: 1, icon: 'el-icon-s-tools', child: [{menuName: '用户管理', id: '/sysUser'}]},
-       // {menuName: '项目管理', id: 2, icon: 'el-icon-s-cooperation', child: [{menuName: '项目立项', id: 112}]},
+        //    {menuName: '系统管理', id: 1, icon: 'el-icon-s-tools', child: [{menuName: '用户管理', id: '/sysUser'}]},
+        // {menuName: '项目管理', id: 2, icon: 'el-icon-s-cooperation', child: [{menuName: '项目立项', id: 112}]},
       ]
     }
   },
@@ -233,7 +245,10 @@ export default {
         username: this.queryInfo.query,
         isAdmin: null,
         pageNum: this.queryInfo.pageNum,
-        pageSize: this.queryInfo.pageSize
+        pageSize: this.queryInfo.pageSize,
+        status : this.queryInfo.status,
+        beginTime: this.queryInfo.beginTime,
+        endTime: this.queryInfo.endTime
       })
       if (result.code !== 200) return this.$message.error('获取用户列表失败!')
       this.userList = result.data.list
@@ -241,7 +256,7 @@ export default {
     },
     //通过多选框选择用户
     changeIndex(value) {
-      this.selectUserIds = value.map((item,index) => {
+      this.selectUserIds = value.map((item) => {
         return item.id
       })
     },
@@ -303,7 +318,7 @@ export default {
     },
     //操作栏删除
     deleteUser(id) {
-      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -318,7 +333,30 @@ export default {
     },
     //功能栏删除
     deleteBaths() {
-      if (this.selectUserIds.length ===0) return this.$message.error('请选择要删除的用户!')
+      if (this.selectUserIds.length === 0) return this.$message.error('请选择要删除的用户!')
+      this.$confirm('此操作将永久删除数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const {data} = await this.$http.delete(`sysUser/deleteBatch/${this.selectUserIds}`)
+        if (data.code !== 200) return this.$message.error('删除失败!')
+        this.$message.success('删除成功!')
+        await this.getUserList()
+      }).catch(() => {
+        this.$message.info('已取消删除!')
+      });
+    },
+    //时间选择器事件
+    changeFullTime(value) {
+      console.log('1233')
+      if (value === null){
+        this.queryInfo.beginTime = value
+        this.queryInfo.endTime = value
+        return
+      }
+      this.queryInfo.beginTime = this.fullTime[0]
+      this.queryInfo.endTime = this.fullTime[1]
 
     }
   }
@@ -327,14 +365,12 @@ export default {
 
 <style lang="less" scoped>
 .sysUser {
-  margin: 20px;
-  //padding-bottom: 50px;
+  margin: 15px;
   padding: 0;
 
-  //.el-form {
-  //  display: flex;
-  //  flex-flow: row wrap;
-  //}
+  .el-row_div {
+    margin-top: 15px;
+  }
 }
 
 </style>

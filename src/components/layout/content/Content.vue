@@ -10,6 +10,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+.el-card {
+  padding-top: 0;
+}
 
 </style>

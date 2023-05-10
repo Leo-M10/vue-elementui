@@ -121,7 +121,7 @@ export default {
 
 <style scoped lang="less">
 .sysMenu {
-  margin: 20px;
+  margin: 15px;
   padding: 0;
 }
 </style>

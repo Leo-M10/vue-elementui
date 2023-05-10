@@ -101,8 +101,6 @@ export default {
     left: 50%;
     transform: translate(-50%,-50%);
 
-    //padding: 10px 5px;
-
     .register_form {
       position: absolute;
       top: 30%;
