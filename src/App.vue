@@ -13,7 +13,6 @@ export default {
   name: 'App',
   created() {
     new elementUiConfig()
-    // new DevicePixelRatio().init()
   },
   components: {
   }
