@@ -216,10 +216,7 @@ export default {
         updateTime: ''
       },
       //面包屑数据
-      breadList: [
-        //    {menuName: '系统管理', id: 1, icon: 'el-icon-s-tools', child: [{menuName: '用户管理', id: '/sysUser'}]},
-        // {menuName: '项目管理', id: 2, icon: 'el-icon-s-cooperation', child: [{menuName: '项目立项', id: 112}]},
-      ]
+      breadList: []
     }
   },
   created() {
