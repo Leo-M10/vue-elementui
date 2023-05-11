@@ -8,7 +8,7 @@
       <div class="topBtn" @click="toCollapse">
         <i class="el-icon-s-fold"></i>
       </div>
-      <el-menu-item index="/home">
+      <el-menu-item index="/system/home">
         <i class="el-icon-s-home"></i>
         <span>首页</span>
       </el-menu-item>

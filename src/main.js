@@ -29,8 +29,9 @@ axios.interceptors.response.use(
     }
 )
 
+//获取面包屑数据排列
 async function getBreadList(route) {
-    const {data} = await this.$http.get(`/sysMenu/getBreadList/${route}`)
+    const {data} = await this.$http.get(`/sysMenu/getBreadList?path=${route}`)
     if (data.code !== 200) return this.$message.error('获取菜单列表失败!')
     let result = data.data
     return result.map((item) => {

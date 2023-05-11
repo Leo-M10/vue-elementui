@@ -1,7 +1,7 @@
 <template>
   <div class="bread">
     <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/home' }">
+      <el-breadcrumb-item :to="{ path: '/system/home' }">
         首页
       </el-breadcrumb-item>
       <el-breadcrumb-item v-for="(item,index) in breadList" :key="index">

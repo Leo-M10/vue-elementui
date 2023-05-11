@@ -12,14 +12,14 @@ const router = new VueRouter({
     routes: [
         {path: '/', redirect: '/login'},
         {path: '/login', component: Login},
-        {
-            path: '/home', component: Layout, redirect: '/home', children: [
-                {path: '/home', component: Content},
-                {path: '/sysUser', component: SysUser},
-                {path: '/sysMenu', component: SysMenu}
-            ]
-        },
         {path: '/register', component: Register},
+        {
+            path: '/system', component: Layout, redirect: '/system/home', children: [
+                {path: 'home', component: Content},
+                {path: 'sysUser', component: SysUser},
+                {path: 'sysMenu', component: SysMenu}
+            ]
+        }
     ]
 })
 // 路由守卫验证token
